@@ -1,0 +1,19 @@
+[project]
+name = "textfile-wordcount-processor"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "johngabriel-cloud", email = "204676482+johngabriel-cloud@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "pytest>=9.1.1",
+]
+
+[project.scripts]
+textfile-wordcount-processor = "textfile_wordcount_processor:main"
+
+[build-system]
+requires = ["uv_build>=0.12.15,<0.13.0"]
+build-backend = "uv_build"

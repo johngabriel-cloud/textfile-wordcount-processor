@@ -36,6 +36,8 @@ An uploaded `.txt` file in an S3 bucket will be read and processed by AWS Lambda
 
 - `src/` stores the core codebase of the Python applicaiton. It separates application code from project files such as tests and configuration.
 - `textfile_wordcount_processor/` is the actual python package. Contains modules that the application and other python code can import.
+- pytest is a development tool and should be in development dependency group instead of being a part of the runtime dependency group. Pytest must be under `[dependency-groups]` in `pyproject.toml`
+
 
 ### Errors and Troubleshooting
 1. Started the whole project typing loose python code

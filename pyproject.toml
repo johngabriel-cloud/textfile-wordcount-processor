@@ -7,6 +7,9 @@ authors = [
     { name = "johngabriel-cloud", email = "204676482+johngabriel-cloud@users.noreply.github.com" }
 ]
 requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.43.117",
+]
 
 [project.scripts]
 textfile-wordcount-processor = "textfile_wordcount_processor:main"

@@ -10,6 +10,12 @@ This project is my application of knowledge that I've learned during my time wit
 
 ## Architecture
 ![Architecture diagram](image.png)
+1. User uploads the `.txt` file
+2. S3 will trigger an event 
+3. Lambda receives the event and requests contents from s3 via boto3
+4. Lambda process the contents and print out the filename and its word count.
+5. Sumbits the information to SNS.
+6. SNS sends out the info to a subscribed email to the topic.
 
 ## Features
 Features — word counting, empty files, invalid inputs
@@ -27,6 +33,12 @@ An uploaded `.txt` file in an S3 bucket will be read and processed by AWS Lambda
 - `wordcount.py`
     - The syntax `if __name__ == "__main__":` prevents the code inside of the block to run when the file is imported. Which allows `wordcount.py` defined in a module to be imported, making the function reusable.
 
+- Pytest is a development dependency, not a application dependency. User must check pyproject.toml/uv.lock
+    - development dependencies are tools you need to test, develop and verify the app.
+        - To install correctly, `uv add --dev pytest` to add pytest as development dependency (linters, formatters, type checkers)
+        - To revert/transfer `uv remove pytest` then add as dev dependency.
+    - application dependencies are tools the app needs to run.
+
 - Pytest doesn't guarantee everything works in CI
     - There's three things:
         1. Tests work
@@ -37,8 +49,12 @@ An uploaded `.txt` file in an S3 bucket will be read and processed by AWS Lambda
 - `src/` stores the core codebase of the Python applicaiton. It separates application code from project files such as tests and configuration.
 - `textfile_wordcount_processor/` is the actual python package. Contains modules that the application and other python code can import.
 - pytest is a development tool and should be in development dependency group instead of being a part of the runtime dependency group. Pytest must be under `[dependency-groups]` in `pyproject.toml`
-
-
+- `lambda_handler(event, context)`
+    - `event` is the s3 event trigger notif, thats why we can see s3 bucket (name) and uploaded object (key) in that dictionary.
+- Event type `PUT` is the upload method if from AWS CLI, Console, AWS SDK.  
+- separate `wordcount.py` to `handler.py` to keep the handler separate from the logic.
+- boto3 is the AWS SDK for Python, SDK is the language that allows users to interact with AWS services from their application code.
+- if not directly communicaiton through http (upload via AWS CLI, AWS Console, SDK) event type is considered as 
 ### Errors and Troubleshooting
 1. Started the whole project typing loose python code
     - Since I'm using `uv` as project manager, I initiated `uv init`.

@@ -29,11 +29,23 @@ An uploaded `.txt` file in an S3 bucket will be read and processed by AWS Lambda
     - only whitespace - passed, words: 0
     - Only new lines and tabs - passed, words: 0
     - punctuations - if attached to another word, words: 0 but punctuation alone in itself can be counted as a word.
+- CI 
+    - for every git push in the repository will activate a workflow for GitHub Actions:
+        - Check repository
+        - Set up Python
+        - Install uv
+        - Install dependencies
+        - Run tests, pytest
+- Pytest `test_handler.py` for handler testing in a local environment
+    - mock, an object that stands in for real dependency during test
+    - patch, temporary replaces target (`with` makes expressions able to `__enter__()` and `__exit__()` methods)
+    - BytesIO for returning bytes to satisfy process in handler
+    - `handler.s3` is better for patch than `s3` alone since `handler.s3` used handler name unlike `s3` that is direct to the original object.
 ## Lessons Learned
 - `wordcount.py`
     - The syntax `if __name__ == "__main__":` prevents the code inside of the block to run when the file is imported. Which allows `wordcount.py` defined in a module to be imported, making the function reusable.
 
-- Pytest is a development dependency, not a application dependency. User must check pyproject.toml/uv.lock
+- Pytest is a development dependency, not an application dependency. User must check pyproject.toml/uv.lock
     - development dependencies are tools you need to test, develop and verify the app.
         - To install correctly, `uv add --dev pytest` to add pytest as development dependency (linters, formatters, type checkers)
         - To revert/transfer `uv remove pytest` then add as dev dependency.
@@ -54,9 +66,11 @@ An uploaded `.txt` file in an S3 bucket will be read and processed by AWS Lambda
 - Event type `PUT` is the upload method if from AWS CLI, Console, AWS SDK.  
 - separate `wordcount.py` to `handler.py` to keep the handler separate from the logic.
 - boto3 is the AWS SDK for Python, SDK is the language that allows users to interact with AWS services from their application code.
-- if not directly communicaiton through http (upload via AWS CLI, AWS Console, SDK) event type is considered as 
+- if not directly communicated through HTTP (upload via AWS CLI, AWS Console, SDK) event type is considered as `PUT` rather than `POST`
 ### Errors and Troubleshooting
 1. Started the whole project typing loose python code
-    - Since I'm using `uv` as project manager, I initiated `uv init`.
+    - Solution: Since I'm using `uv` as project manager, I initiated `uv init`.
 2. Didn't assign `test_wordcount.py` to `tests` folder and `wordcount.py` to `src`. Upon transfering the files to their designated folders, pytest producing error.
-    - changed `from wordcount import count_words` to `from textfile_wordcount_processor.wordcount import count_words`
+    - Solution: changed `from wordcount import count_words` to `from textfile_wordcount_processor.wordcount import count_words`
+3. `ERROR tests/test_handler.py - botocore.exceptions.NoRegionError: You must specify a region.` during `test_handler.py` pytest
+    - Solution: `handler.py` automatically locates AWS region, local test needs `os.environ["AWS_DEFAULT_REGION"] = "us-east-1"` as a placeholder.

@@ -1,4 +1,3 @@
-import pytest
 import os
 os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
@@ -8,7 +7,7 @@ from unittest.mock import patch
 from io import BytesIO
 
 
-def test_lambda_handler():
+def test_lambda_handler_txt():
     event = {
     "Records": [
             {
@@ -29,11 +28,13 @@ def test_lambda_handler():
             
             with patch('textfile_wordcount_processor.handler.sns') as mock_sns: #temporary replace sns object
                 lambda_handler(event, None) #catches both patch s3 and sns as function
+                bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
+                object_key = event["Records"][0]["s3"]["object"]["key"]
                 mock_s3.get_object.assert_called_once_with(
-                                Bucket='test-bucket', 
-                                Key='sample.txt'
+                                Bucket=bucket_name, 
+                                Key=object_key
                                 )
                 mock_sns.publish.assert_called_once_with(
                     TopicArn=handler.os.environ['SNS_TOPIC_ARN'],
-                    Message=f"Total word count for sample.txt in bucket test-bucket: {total_count}"
+                    Message=f"Total word count for {object_key} in bucket {bucket_name}: {total_count}"
                 )

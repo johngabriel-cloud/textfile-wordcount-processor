@@ -1,5 +1,5 @@
 import os
-os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+os.environ["AWS_DEFAULT_REGION"] = "us-west-2"
 
 from textfile_wordcount_processor.handler import lambda_handler
 import textfile_wordcount_processor.handler as handler
@@ -38,3 +38,81 @@ def test_lambda_handler_txt():
                     TopicArn=handler.os.environ['SNS_TOPIC_ARN'],
                     Message=f"Total word count for {object_key} in bucket {bucket_name}: {total_count}"
                 )
+
+def test_lambda_handler_TXT():
+    event = {
+    "Records": [
+            {
+            "s3": {
+                "bucket": {"name": "test-bucket"},
+                "object": {"key": "sample.TXT"}
+                }
+            }
+        ]
+    }
+
+    total_count = 7 #Predicts the number of words
+    with patch.dict(os.environ, {"SNS_TOPIC_ARN": "test-topic-arn"}): #dummy Topic ARN to use for patch
+
+        with patch('textfile_wordcount_processor.handler.s3') as mock_s3: #temporary replace s3 object
+            fake_response = BytesIO(b"Hello world! This is a test file.")
+            mock_s3.get_object.return_value = {'Body': fake_response}
+            
+            with patch('textfile_wordcount_processor.handler.sns') as mock_sns: #temporary replace sns object
+                lambda_handler(event, None) #catches both patch s3 and sns as function
+                bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
+                object_key = event["Records"][0]["s3"]["object"]["key"]
+                mock_s3.get_object.assert_called_once_with(
+                                Bucket=bucket_name, 
+                                Key=object_key
+                                )
+                mock_sns.publish.assert_called_once_with(
+                    TopicArn=handler.os.environ['SNS_TOPIC_ARN'],
+                    Message=f"Total word count for {object_key} in bucket {bucket_name}: {total_count}"
+                )   
+
+def test_lambda_handler_csv():
+    event = {
+    "Records": [
+            {
+            "s3": {
+                "bucket": {"name": "test-bucket"},
+                "object": {"key": "sample.csv"}
+                }
+            }
+        ]
+    }
+
+    with patch.dict(os.environ, {"SNS_TOPIC_ARN": "test-topic-arn"}): #dummy Topic ARN to use for patch
+
+        with patch('textfile_wordcount_processor.handler.s3') as mock_s3: #temporary replace s3 object
+            
+            with patch('textfile_wordcount_processor.handler.sns') as mock_sns: #temporary replace sns object
+                lambda_handler(event, None) #catches both patch s3 and sns as function
+                bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
+                object_key = event["Records"][0]["s3"]["object"]["key"]
+                mock_s3.get_object.assert_not_called()
+                mock_sns.publish.assert_not_called()
+
+def test_lambda_handler_jpeg():
+    event = {
+    "Records": [
+            {
+            "s3": {
+                "bucket": {"name": "test-bucket"},
+                "object": {"key": "sample.jpeg"}
+                }
+            }
+        ]
+    }
+
+    with patch.dict(os.environ, {"SNS_TOPIC_ARN": "test-topic-arn"}): #dummy Topic ARN to use for patch
+
+        with patch('textfile_wordcount_processor.handler.s3') as mock_s3: #temporary replace s3 object
+            
+            with patch('textfile_wordcount_processor.handler.sns') as mock_sns: #temporary replace sns object
+                lambda_handler(event, None) #catches both patch s3 and sns as function
+                bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
+                object_key = event["Records"][0]["s3"]["object"]["key"]
+                mock_s3.get_object.assert_not_called()
+                mock_sns.publish.assert_not_called()

@@ -9,6 +9,9 @@ sns = boto3.client('sns')
 def lambda_handler(event, context):
     bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
     object_key = event["Records"][0]["s3"]["object"]["key"]
+    if not object_key.lower().endswith('.txt'):
+        print(f"File {object_key} is not a text file. Skipping processing.")
+        return
     response = s3.get_object(
         Bucket=bucket_name,
         Key=object_key

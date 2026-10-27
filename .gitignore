@@ -1,19 +1,63 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+*.egg
+*.egg-info/
+dist/
+build/
 
-# Environments
+# Virtual environments
 .venv/
-env/
 venv/
-ENV/
-
-# Configuration and secrets
-.env
-.env.local
+env/
 
 # Testing and coverage
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+
+# Type checking and linting
+.mypy_cache/
+.ruff_cache/
+.pyright/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Terraform lock file should be committed
+# Keep .terraform.lock.hcl tracked
+
+# AWS credentials
+.aws/

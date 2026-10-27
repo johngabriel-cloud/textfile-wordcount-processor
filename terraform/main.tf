@@ -14,8 +14,7 @@ provider "aws" {
 
 #Input variables for the Terraform configuration. 
 variable "bucket_name" {
-  type    = string
-  default = "wordcount-bucket-981237"
+  type = string
 }
 
 variable "notification_email" {
